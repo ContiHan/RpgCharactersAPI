@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Relationships.Data;
-using System.Reflection.Metadata.Ecma335;
 
 var builder = WebApplication.CreateBuilder(args);
 {
@@ -11,6 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
     {
         options.UseSqlServer(builder.Configuration.GetConnectionString(StaticData.DefaultSQLConnection));
     });
+    builder.Services.AddControllersWithViews()
+     .AddNewtonsoftJson(options =>
+     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+ );
 }
 
 var app = builder.Build();

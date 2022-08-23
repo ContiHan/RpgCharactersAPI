@@ -7,7 +7,6 @@ namespace Relationships.Models
     {
         public int Id { get; set; }
         public string Username { get; set; } = string.Empty;
-        [JsonIgnore]
         public List<Character> Characters { get; set; }
     }
 }
