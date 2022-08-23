@@ -1,8 +1,15 @@
+using Microsoft.EntityFrameworkCore;
+using Relationships.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 {
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+    builder.Services.AddDbContext<DataContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString(StaticData.DefaultSQLConnection));
+    });
 }
 
 var app = builder.Build();
