@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Relationships.Data;
 using Relationships.Models;
+using Relationships.Models.DTO;
 
 namespace Relationships.Controllers
 {
@@ -18,26 +18,54 @@ namespace Relationships.Controllers
         }
 
         [HttpGet(Name = nameof(GetAllCharacters))]
-        public async Task<ActionResult<IEnumerable<Character>>> GetAllCharacters()
+        public async Task<ActionResult<List<CharacterDTO>>> GetAllCharacters()
         {
             if (_context.Characters is null)
             {
                 return NotFound();
             }
-            return Ok(await _context.Characters.Include(i => i.User).ToListAsync());
+
+            var charactersFromDb = _context.Characters.Include(i => i.User);
+            var charactersDTO = new List<CharacterDTO>();
+            foreach (var character in charactersFromDb)
+            {
+                charactersDTO.Add(new CharacterDTO
+                {
+                    Id = character.Id,
+                    Name = character.Name,
+                    Class = character.Class,
+                    Username = character.User.Username
+                });
+                await Task.CompletedTask;
+            }
+
+            return Ok(charactersDTO);
         }
 
         [HttpGet("userId={userId:int}", Name = nameof(GetCharactersByUserId))]
-        public async Task<ActionResult<Character>> GetCharactersByUserId(int userId)
+        public async Task<ActionResult<List<CharacterDTO>>> GetCharactersByUserId(int userId)
         {
-            var characters = _context.Characters
+            var charactersFromDb = _context.Characters
                 .Include(i => i.User)
                 .Where(c => c.UserId == userId);
-            if (characters is null || !await characters.AnyAsync())
+            if (charactersFromDb is null || !await charactersFromDb.AnyAsync())
             {
                 return NotFound();
             }
-            return Ok(await characters.ToListAsync());
+
+            var charactersDTO = new List<CharacterDTO>();
+            foreach (var character in charactersFromDb)
+            {
+                charactersDTO.Add(new CharacterDTO
+                {
+                    Id = character.Id,
+                    Name = character.Name,
+                    Class = character.Class,
+                    Username = character.User.Username
+                });
+            }
+
+            return Ok(charactersDTO);
         }
     }
 }
